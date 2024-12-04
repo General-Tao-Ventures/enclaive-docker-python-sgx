@@ -8,5 +8,9 @@ services:
       context: .
     ports:
       - "443:443"
+      - "8888:8888"
     devices:
       - "/dev/sgx_enclave:/dev/sgx_enclave"
+    volumes:
+      - ./certs:/app/certs
+    command: uvicorn main:app --host 0.0.0.0 --port 8888 --ssl-keyfile /app/certs/key.pem --ssl-certfile /app/certs/cert.pem

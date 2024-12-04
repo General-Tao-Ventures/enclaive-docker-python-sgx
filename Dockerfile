@@ -19,3 +19,13 @@ RUN gramine-argv-serializer "/usr/bin/python3" "/app/main.py" > args.txt &&\
 EXPOSE 3306/tcp
 
 ENTRYPOINT [ "/app/entrypoint.sh" ]
+
+# Copy SSL certificates into the image
+COPY certs/cert.pem /app/cert.pem
+COPY certs/key.pem /app/key.pem
+
+# Expose port 8000
+EXPOSE 8888
+
+# Start the server with SSL
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8888", "--ssl-keyfile", "/app/key.pem", "--ssl-certfile", "/app/cert.pem"]
