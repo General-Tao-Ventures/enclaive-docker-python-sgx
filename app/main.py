@@ -1,4 +1,6 @@
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Security, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security.api_key import APIKeyHeader
 import hashlib
 import aiohttp
 import asyncio
@@ -6,10 +8,45 @@ import os
 from database import SessionLocal, engine
 import models
 from sqlalchemy.orm import Session
+from dotenv import load_dotenv
+
+# Load environment variables from the mounted config directory
+env_path = os.getenv('ENV_FILE', '/app/config/.env')
+# load_dotenv(env_path)
+load_dotenv()
+
+# Get API key from environment variable with a default value for safety
+API_KEY = os.getenv("API_KEY")
+if not API_KEY:
+    raise RuntimeError("API_KEY environment variable not set")
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+API_KEY_NAME = "X-API-Key"
+API_KEY = os.getenv("API_KEY")  # Get API key from environment variable
+
+if not API_KEY:
+    raise RuntimeError("API_KEY environment variable not set")
+
+api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=True)
+
+async def get_api_key(api_key_header: str = Security(api_key_header)):
+    if api_key_header != API_KEY:
+        raise HTTPException(
+            status_code=403,
+            detail="Invalid API Key"
+        )
+    return api_key_header
 
 def get_db():
     db = SessionLocal()
@@ -19,7 +56,10 @@ def get_db():
         db.close()
 
 @app.get("/generate_proof")
-async def generate_proof(link: str = Query(...)):
+async def generate_proof(
+    link: str = Query(...),
+    api_key: str = Depends(get_api_key)
+):
     link_hash = hashlib.sha3_256(link.encode('utf-8')).hexdigest()
     data_hash = await download_and_hash(link)
     if data_hash is None:
@@ -32,7 +72,10 @@ async def generate_proof(link: str = Query(...)):
     return {"message": "Proof submitted successfully", "link_hash": link_hash}
 
 @app.get("/get_proof")
-def get_proof(proof_hash: str = Query(...)):
+def get_proof(
+    proof_hash: str = Query(...),
+    api_key: str = Depends(get_api_key)
+):
     db = next(get_db())
     data = db.query(models.Proof).filter(models.Proof.proof_hash == proof_hash).first()
     if data:

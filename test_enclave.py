@@ -10,9 +10,18 @@ SERVER_ADDRESS = 'https://localhost:8888'
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+# Add this at the top with other constants
+API_KEY = "primeinsights-priv-api-key"
+HEADERS = {"X-API-Key": API_KEY}
+
 async def submit_proof(link):
     params = {'link': link}
-    response = requests.get(f"{SERVER_ADDRESS}/generate_proof", params=params, verify=False)
+    response = requests.get(
+        f"{SERVER_ADDRESS}/generate_proof", 
+        params=params, 
+        headers=HEADERS,  # Add headers here
+        verify=False
+    )
     if response.status_code == 200:
         data = response.json()
         print(f"Submitted proof for link: {link}")
@@ -25,7 +34,12 @@ async def submit_proof(link):
 
 async def query_proof(link_hash):
     params = {'proof_hash': link_hash}
-    response = requests.get(f"{SERVER_ADDRESS}/get_proof", params=params, verify=False)
+    response = requests.get(
+        f"{SERVER_ADDRESS}/get_proof", 
+        params=params, 
+        headers=HEADERS,  # Add headers here
+        verify=False
+    )
     if response.status_code == 200:
         data = response.json()
         print(f"Queried proof for link hash: {link_hash}")
