@@ -83,6 +83,9 @@ def get_proof(
     else:
         raise HTTPException(status_code=404, detail="Proof not found.")
 
+# TODO: Add a route/function for the Proof of Uniqueness database queries
+# See: PoU-Server/ on how to query the database, ideally just port in here so it all runs on the same app/server
+
 async def download_and_hash(url):
     temp_file = "temp_download.zip"
     try:
