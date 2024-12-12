@@ -16,4 +16,4 @@ services:
       - ./.env:/app/config/.env
     environment:
       - ENV_FILE=/app/config/.env
-    command: uvicorn main:app --host 0.0.0.0 --port 8888 --ssl-keyfile /app/certs/key.pem --ssl-certfile /app/certs/cert.pem
+    # command: python3 main.py --host 0.0.0.0 --port 8888 --ssl-keyfile /app/certs/key.pem --ssl-certfile /app/certs/cert.pem --env-file /app/config/.env

@@ -3,3 +3,10 @@ uvicorn
 aiohttp
 sqlalchemy
 python-dotenv
+pydantic>=2.9.1
+pydantic_core>=2.23.3
+requests>=2.26.0
+datasketch>=1.6.5
+numpy>=2.1.1
+argparse
+uuid

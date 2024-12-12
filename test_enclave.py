@@ -11,7 +11,7 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Add this at the top with other constants
-API_KEY = "primeinsights-priv-api-key"
+API_KEY = "API_KEY_HERE"
 HEADERS = {"X-API-Key": API_KEY}
 
 async def submit_proof(link):
