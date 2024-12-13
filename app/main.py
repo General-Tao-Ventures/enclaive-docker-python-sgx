@@ -58,7 +58,7 @@ def get_db():
         db.close()
 
 
-@app.post("/generate_proof")
+@app.post("/proof")
 async def generate_proof(
     item: schemas.GenerateProof,
     api_key: str = Depends(get_api_key)
@@ -87,7 +87,7 @@ async def generate_proof(
     return {"message": "Proof submitted successfully", "proof_key": link_hash, "data_hash": data_hash}
 
 
-@app.get("/get_proof")
+@app.get("/proof")
 def get_proof(
     proof_key: str = Query(...),
     api_key: str = Depends(get_api_key)
@@ -98,9 +98,6 @@ def get_proof(
         return {"data_hash": data.data_hash}
     else:
         raise HTTPException(status_code=404, detail="Proof not found.")
-
-# TODO: Add a route/function for the Proof of Uniqueness database queries
-# See: PoU-Server/ on how to query the database, ideally just port in here so it all runs on the same app/server
 
 
 if __name__ == "__main__":
