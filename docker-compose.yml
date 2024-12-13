@@ -2,18 +2,27 @@ version: '2'
 
 services:
   python-sgx:
-    image: enclaive/python-sgx
-    container_name: "python-sgx"
     build:
       context: .
     ports:
-      - "443:443"
       - "8888:8888"
     devices:
       - "/dev/sgx_enclave:/dev/sgx_enclave"
     volumes:
       - ./certs:/app/certs
       - ./.env:/app/config/.env
+      - ./db:/app/db
+  postres:
+    image: postgres:latest
+    container_name: postgres
     environment:
-      - ENV_FILE=/app/config/.env
-    command: uvicorn main:app --host 0.0.0.0 --port 8888 --ssl-keyfile /app/certs/key.pem --ssl-certfile /app/certs/cert.pem
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

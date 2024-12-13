@@ -1,5 +1,6 @@
+aiohttp
 fastapi
 uvicorn
-aiohttp
 sqlalchemy
 python-dotenv
+psycopg2-binary

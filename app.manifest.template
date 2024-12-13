@@ -7,6 +7,7 @@ loader.log_level = "error"
 
 loader.env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}"
 loader.env.MALLOC_ARENA_MAX = "1"
+loader.env.ALLOW_NETWORK = "1"
 
 sgx.nonpie_binary = true
 
@@ -34,7 +35,16 @@ sgx.trusted_files = [
     "file:{{ arch_libdir }}/",
     "file:/app/args.txt",
     "file:/usr/bin/python3",
-    "file:/app/main.py",
+    "file:/app/",
+    "file:/usr/lib/python3/",
     "file:/usr/lib/python3.10/",
+    "file:/usr/local/lib/python3.10/",
     "file:/etc/localtime",
+]
+
+sgx.allowed_files = [
+    # Required for internet access from inside the enclave
+    "file:/etc/hosts",
+    "file:/etc/resolv.conf",
+    "file:/app/db/proofs.db",
 ]

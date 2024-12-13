@@ -1,6 +1,6 @@
 # mariadb with patches
 
-FROM enclaive/gramine-os:jammy-7e9d6925
+FROM enclaive/gramine-os:jammy
 
 RUN apt-get update \
     && apt-get install -y wget build-essential python3 python3-pip \
@@ -16,13 +16,12 @@ RUN pip3 install python-dotenv
 # Copy the rest of the application
 COPY ./app /app/
 COPY ./app.manifest.template ./entrypoint.sh /app/
-
-# Copy SSL certificates into the image
-COPY certs/cert.pem /app/cert.pem
-COPY certs/key.pem /app/key.pem
+COPY ./.env /app/
 
 # Create a directory for environment files
-RUN mkdir -p /app/config
+RUN mkdir -p /app/db
+COPY ./db/proofs.db /app/db/proofs.db
+RUN chmod +w /app/db/proofs.db
 
 RUN gramine-argv-serializer "/usr/bin/python3" "/app/main.py" > args.txt &&\
     gramine-manifest -Darch_libdir=/lib/x86_64-linux-gnu app.manifest.template app.manifest &&\
