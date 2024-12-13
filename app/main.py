@@ -1,9 +1,9 @@
 from fastapi import FastAPI, HTTPException, Query, Security, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security.api_key import APIKeyHeader
-from app.api.endpoints import proof
-from app.db.session import engine
-from app.db.base import Base
+from api.endpoints import proof, minhash
+from db.session import engine
+from db.base import Base
 
 Base.metadata.create_all(bind=engine)
 
@@ -18,6 +18,7 @@ app.add_middleware(
 )
 
 app.include_router(proof.router, prefix="/proof", tags=["proof"])
+app.include_router(minhash.router, prefix="/minhash", tags=["minhash"])
 
 if __name__ == "__main__":
     import uvicorn

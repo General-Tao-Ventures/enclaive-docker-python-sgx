@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Integer
-from app.db.base import Base
+from db.base import Base
 
 class OrderHistory(Base):
     __tablename__ = "order_history"

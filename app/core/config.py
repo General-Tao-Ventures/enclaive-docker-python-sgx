@@ -9,6 +9,8 @@ class Settings(BaseModel):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
+    MINHASH_LSH_THRESHOLD: float
+    MINHASH_NUM_PERM: int
 
 
 load_dotenv()
@@ -18,4 +20,6 @@ settings = Settings(
     POSTGRES_USER=os.getenv("POSTGRES_USER"),
     POSTGRES_PASSWORD=os.getenv("POSTGRES_PASSWORD"),
     POSTGRES_DB=os.getenv("POSTGRES_DB"),
+    MINHASH_LSH_THRESHOLD=float(os.getenv("MINHASH_LSH_THRESHOLD", "0.7")),
+    MINHASH_NUM_PERM=int(os.getenv("MINHASH_NUM_PERM", "128")),
 )
