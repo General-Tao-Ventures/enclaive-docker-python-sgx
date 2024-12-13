@@ -1,25 +1,26 @@
 from fastapi import FastAPI, HTTPException, Query, Security, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security.api_key import APIKeyHeader
+from dotenv import load_dotenv
 import hashlib
-import asyncio
-import aiohttp
 import os
 
 from database import SessionLocal, engine
 from sqlalchemy.orm import Session
-from dotenv import load_dotenv
 
 import models
-
-from pydantic import BaseModel
-
-class GenerateProof(BaseModel):
-    link: str
+import schemas
+from utils import download_and_hash, is_valid_amazon_link
     
 load_dotenv()
 
 models.Base.metadata.create_all(bind=engine)
+
+
+API_KEY = os.getenv("API_KEY")
+if not API_KEY:
+    raise RuntimeError("API_KEY environment variable not set")
+
 
 app = FastAPI()
 
@@ -31,12 +32,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 API_KEY_NAME = "X-API-Key"
-API_KEY = os.getenv("API_KEY")  # Get API key from environment variable
-
-if not API_KEY:
-    raise RuntimeError("API_KEY environment variable not set")
-
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=True)
 
 async def get_api_key(api_key_header: str = Security(api_key_header)):
@@ -47,6 +44,7 @@ async def get_api_key(api_key_header: str = Security(api_key_header)):
         )
     return api_key_header
 
+
 def get_db():
     db = SessionLocal()
     try:
@@ -54,22 +52,29 @@ def get_db():
     finally:
         db.close()
 
+
 @app.post("/generate_proof")
 async def generate_proof(
-    item: GenerateProof,
+    item: schemas.GenerateProof,
     api_key: str = Depends(get_api_key)
 ):
-    print("link:", item.link)
+    print("Amazon link to generate proof:", item.link)
+    if not is_valid_amazon_link(item.link):
+        raise HTTPException(status_code=400, detail="Invalid Amazon link")
+
     link_hash = hashlib.sha3_256(item.link.encode('utf-8')).hexdigest()
     data_hash = await download_and_hash(item.link)
     if data_hash is None:
         raise HTTPException(status_code=400, detail="Failed to download or hash data.")
+
     db = next(get_db())
     db_item = models.Proof(proof_hash=link_hash, data_hash=data_hash)
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
+    
     return {"message": "Proof submitted successfully", "link_hash": link_hash, "data_hash": data_hash}
+
 
 @app.get("/get_proof")
 def get_proof(
@@ -85,20 +90,6 @@ def get_proof(
 
 # TODO: Add a route/function for the Proof of Uniqueness database queries
 # See: PoU-Server/ on how to query the database, ideally just port in here so it all runs on the same app/server
-
-async def download_and_hash(url):
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, ssl=False) as resp:
-                if resp.status == 200:
-                    content = await resp.read()
-                    data_hash = hashlib.sha3_256(content).hexdigest()
-                    return data_hash
-    except Exception as e:
-        print(f"Error downloading or hashing data: {e}")
-        return None
-    finally:
-        pass
 
 
 if __name__ == "__main__":
