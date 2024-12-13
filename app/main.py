@@ -14,6 +14,11 @@ from utils import download_and_hash, is_valid_amazon_link
     
 load_dotenv()
 
+if os.getenv("RESET_DB"):
+    print("Dropping all tables as RESET_DB is set")
+    models.Base.metadata.drop_all(engine)
+
+print("Creating tables if not exist")
 models.Base.metadata.create_all(bind=engine)
 
 
@@ -63,26 +68,32 @@ async def generate_proof(
         raise HTTPException(status_code=400, detail="Invalid Amazon link")
 
     link_hash = hashlib.sha3_256(item.link.encode('utf-8')).hexdigest()
+    
+    db = next(get_db())
+    data = db.query(models.Proof).filter(models.Proof.proof_key == link_hash).first()
+    if data:
+        raise HTTPException(status_code=400, detail="The proof already generated")
+    
     data_hash = await download_and_hash(item.link)
     if data_hash is None:
         raise HTTPException(status_code=400, detail="Failed to download or hash data.")
 
     db = next(get_db())
-    db_item = models.Proof(proof_hash=link_hash, data_hash=data_hash)
+    db_item = models.Proof(proof_key=link_hash, data_hash=data_hash)
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
-    
-    return {"message": "Proof submitted successfully", "link_hash": link_hash, "data_hash": data_hash}
+
+    return {"message": "Proof submitted successfully", "proof_key": link_hash, "data_hash": data_hash}
 
 
 @app.get("/get_proof")
 def get_proof(
-    proof_hash: str = Query(...),
+    proof_key: str = Query(...),
     api_key: str = Depends(get_api_key)
 ):
     db = next(get_db())
-    data = db.query(models.Proof).filter(models.Proof.proof_hash == proof_hash).first()
+    data = db.query(models.Proof).filter(models.Proof.proof_key == proof_key).first()
     if data:
         return {"data_hash": data.data_hash}
     else:
