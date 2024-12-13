@@ -1,11 +1,5 @@
 from sqlalchemy import Column, String, Integer
-from database import Base
-
-class Proof(Base):
-    __tablename__ = "proofs"
-
-    proof_key = Column(String, primary_key=True, index=True)
-    data_hash = Column(String, index=True)
+from app.db.base import Base
 
 class OrderHistory(Base):
     __tablename__ = "order_history"
