@@ -1,9 +1,9 @@
 from fastapi import FastAPI, HTTPException, Query, Security, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security.api_key import APIKeyHeader
-from api.endpoints import proof, minhash
-from db.session import engine
-from db.base import Base
+from app.api.endpoints import proof, minhash
+from app.db.session import engine
+from app.db.base import Base
 
 Base.metadata.create_all(bind=engine)
 

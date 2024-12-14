@@ -3,15 +3,15 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from schemas.minhash import MinHashInput, SaveMinHashOutput, QueryMinHashOutputOne, QueryMinHashOutput
-from db.models.proof import Proof
-from services.proof import get_proof_by_proof_key, create_proof
-from api.deps import get_db, get_api_key
-from utils.misc import is_valid_amazon_link, download_and_hash
-from utils.minhash import deserialize_minhash, serialize_minhash
-from core.config import settings
+from app.db.models.proof import Proof
+from app.services.proof import get_proof_by_proof_key, create_proof
+from app.api.deps import get_db, get_api_key
+from app.utils.misc import is_valid_amazon_link, download_and_hash
+from app.utils.minhash import deserialize_minhash, serialize_minhash
+from app.core.config import settings
 from datasketch import MinHashLSH
-from services.minhash import save_minhash as save_minhash_db
-from services.minhash import get_minhash_by_id
+from app.services.minhash import save_minhash as save_minhash_db
+from app.services.minhash import get_minhash_by_id
 
 router = APIRouter()
 

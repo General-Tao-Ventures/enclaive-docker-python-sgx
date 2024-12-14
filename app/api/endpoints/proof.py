@@ -3,11 +3,11 @@ from sqlalchemy.orm import Session
 from typing import List
 import hashlib
 
-from schemas.proof import GenerateProofInput, GenerateProofOutput, GetProofOutput
-from db.models.proof import Proof
-from services.proof import get_proof_by_proof_key, create_proof
-from api.deps import get_db, get_api_key
-from utils.misc import is_valid_amazon_link, download_and_hash
+from app.schemas.proof import GenerateProofInput, GenerateProofOutput, GetProofOutput
+from app.db.models.proof import Proof
+from app.services.proof import get_proof_by_proof_key, create_proof
+from app.api.deps import get_db, get_api_key
+from app.utils.misc import is_valid_amazon_link, download_and_hash
 
 
 router = APIRouter()

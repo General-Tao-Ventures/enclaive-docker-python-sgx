@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-from db.models.minhash import MinHash
+from app.db.models.minhash import MinHash
 from utils.minhash import serialize_minhash, deserialize_minhash
-from core.config import settings
-from db.models.minhash import MinHash as MinHashDb
+from app.core.config import settings
+from app.db.models.minhash import MinHash as MinHashDb
 from datasketch import MinHash
 
 

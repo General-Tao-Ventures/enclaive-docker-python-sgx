@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String
-from db.base import Base
+from app.db.base import Base
 
 class MinHash(Base):
     __tablename__ = "minhashes"

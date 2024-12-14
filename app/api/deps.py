@@ -2,7 +2,6 @@
 from fastapi import FastAPI, HTTPException, Query, Security, Depends
 from fastapi.security.api_key import APIKeyHeader
 from sqlalchemy.orm import Session
-from core.config import settings
 
 
 API_KEY_NAME = "X-API-Key"
