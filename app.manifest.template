@@ -23,7 +23,7 @@ fs.mounts = [
 
 ]
 sgx.rpc_thread_num = 16
-sgx.thread_num = 16
+sgx.thread_num = 64
 sgx.enclave_size = "2G"
 
 sgx.debug = false

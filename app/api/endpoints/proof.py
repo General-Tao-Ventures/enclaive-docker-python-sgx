@@ -12,7 +12,6 @@ from app.utils.misc import is_valid_amazon_link, download_and_hash
 
 router = APIRouter()
 
-
 @router.get("/{proof_key}", response_model=GetProofOutput)
 def get_proof(
     proof_key: str,
