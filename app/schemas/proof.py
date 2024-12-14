@@ -4,6 +4,7 @@ class GenerateProofInput(BaseModel):
     link: str
 
 class GenerateProofOutput(BaseModel):
+    link: str
     proof_key: str
 
 class GetProofOutput(BaseModel):

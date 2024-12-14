@@ -45,4 +45,4 @@ async def generate_proof(
 
     create_proof(db, Proof(proof_key=proof_key, data_hash=data_hash))
 
-    return {"message": "Proof submitted successfully", "proof_key": proof_key, "data_hash": data_hash}
+    return {"proof_key": proof_key, "link": item.link}
