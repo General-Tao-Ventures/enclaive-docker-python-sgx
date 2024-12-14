@@ -1,32 +1,24 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
 
 from schemas.minhash import MinHashInput, SaveMinHashOutput, QueryMinHashOutputOne, QueryMinHashOutput
 from app.db.models.proof import Proof
-from app.services.proof import get_proof_by_proof_key, create_proof
-from app.api.deps import get_db, get_api_key
-from app.utils.misc import is_valid_amazon_link, download_and_hash
+from app.api.deps import get_db, get_api_key, get_minhash_lsh
 from app.utils.minhash import deserialize_minhash, serialize_minhash
 from app.core.config import settings
-from datasketch import MinHashLSH
 from app.services.minhash import save_minhash as save_minhash_db
 from app.services.minhash import get_minhash_by_id
+from datasketch import MinHashLSH
 
 router = APIRouter()
-
-# Create the MinHashLSH object
-lsh = MinHashLSH(
-    threshold=settings.MINHASH_LSH_THRESHOLD,
-    num_perm=settings.MINHASH_NUM_PERM    
-)
 
 # Save a minhash entry
 @router.post("/", response_model=SaveMinHashOutput)
 def save_minhash(
     item: MinHashInput,
     api_key: str = Depends(get_api_key),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    lsh: MinHashLSH = Depends(get_minhash_lsh)
 ):
     try:
         # Deserialize the minhash
@@ -56,7 +48,8 @@ def save_minhash(
 async def query_similar_minhashes(
     item: MinHashInput,
     api_key: str = Depends(get_api_key),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    lsh: MinHashLSH = Depends(get_minhash_lsh)
 ):
     try:
         # Deserialize the minhash

@@ -4,6 +4,7 @@ from fastapi.security.api_key import APIKeyHeader
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.core.config import settings
+from app.services.minhash import shared_lsh
 
 API_KEY_NAME = "X-API-Key"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=True)
@@ -15,3 +16,6 @@ async def get_api_key(api_key_header: str = Security(api_key_header)):
             detail="Invalid API Key"
         )
     return api_key_header
+
+def get_minhash_lsh():
+    return shared_lsh

@@ -1,11 +1,15 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-from app.db.models.minhash import MinHash
-from utils.minhash import serialize_minhash, deserialize_minhash
+from app.utils.minhash import serialize_minhash, deserialize_minhash
 from app.core.config import settings
 from app.db.models.minhash import MinHash as MinHashDb
-from datasketch import MinHash
+from datasketch import MinHash, MinHashLSH
 
+# Create the MinHashLSH object
+shared_lsh = MinHashLSH(
+    threshold=settings.MINHASH_LSH_THRESHOLD,
+    num_perm=settings.MINHASH_NUM_PERM
+)
 
 # Insert a minhash entry into the database
 def save_minhash(db: Session, user_id, minhash) -> int:
