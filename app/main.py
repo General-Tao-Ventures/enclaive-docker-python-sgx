@@ -17,8 +17,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(proof.router, prefix="/proof", tags=["proof"])
-app.include_router(minhash.router, prefix="/minhash", tags=["minhash"])
+app.include_router(proof.router, prefix="/api/proof", tags=["proof"])
+app.include_router(minhash.router, prefix="/api/minhash", tags=["minhash"])
 
 if __name__ == "__main__":
     import uvicorn
