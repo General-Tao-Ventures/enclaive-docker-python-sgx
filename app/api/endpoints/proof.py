@@ -27,7 +27,7 @@ def get_proof(
 @router.post("/", response_model=GenerateProofOutput)
 async def generate_proof(
     item: GenerateProofInput,
-    api_key: str = Depends(get_api_key),
+    # api_key: str = Depends(get_api_key),
     db: Session = Depends(get_db)
 ):
     print("Amazon link to generate proof:", item.link)
