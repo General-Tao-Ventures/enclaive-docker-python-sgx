@@ -1,3 +1,4 @@
+import re
 import hashlib
 import aiohttp
 from urllib.parse import urlparse
@@ -18,9 +19,10 @@ async def download_and_hash(url):
 
 def is_valid_amazon_link(link):
     parsed_url = urlparse(link)
+    pattern = r'^.*\.s3\.amazonaws\.[a-z]{2,3}$'
     if not parsed_url.scheme == "https":
         return False
-    if not parsed_url.netloc.endswith("s3.amazonaws.com"):
+    if not re.match(pattern, parsed_url.netloc):
         return False
     if not parsed_url.path.endswith("Your%20Orders.zip"):
         return False
