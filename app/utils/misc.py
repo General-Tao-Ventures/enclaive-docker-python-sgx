@@ -24,6 +24,6 @@ def is_valid_amazon_link(link):
         return False
     if not re.match(pattern, parsed_url.netloc):
         return False
-    if not parsed_url.path.endswith("Your%20Orders.zip"):
+    if not parsed_url.path.endswith("All%20Data%20Categories.zip"):
         return False
     return True
