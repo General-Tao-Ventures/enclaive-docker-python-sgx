@@ -1,0 +1,7 @@
+from datasketch import MinHash
+from app.utils.misc import is_valid_amazon_link
+
+if __name__ == "__main__":
+    link = "https://privacy-data-requests-us-east-1-768632110030.s3.amazonaws.ca/83410abb-9fce-40a0-9185-53ebe3342639/files/All%20Data%20Categories.zip?response-cache-control=no-store%2C%20max-age%3D0&versionId=eJtAJB.Ie_ZHBhbwixDVgJaCzSXu2N1b&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEE4aCXVzLWVhc3QtMSJHMEUCIQDAnn5hg0kImBwacRJq9YfVfZZfQXAWJD9VTN79LC4coQIgR9cCuUQXAYHxjLCAW%2BnyatpzWqWRJKieyh2M%2FbDfhe8qngIINxADGgw0NzA3NjEyMTc1MDUiDE9HQ8E3dzbNUST%2FUir7AfxthJkLlN39Tr2JvkUChn9j1ae02iKDteCJTvAYvNX3VgUJw0uVhytXnmWU81NnK9KH1AYUQzIZzNavPDR%2BRxQhsK71SOBGIcrVWiN0G2Awd9r1wecxgal52BustamXSqPh2M8Mx73xf2dHlX%2Bj5nxWlSLbhGlRg%2FEFzxLsOace%2Bi208ZyZF7raF9Bl4DJaq7w6mT%2BFs5x2TA1gQnXa6HNnjz65sPtpVJiz34jRlJk999tvYyqXscQCIq8ctbSY6wi%2FmWibiyb9WtHSahT3y0Vd1BXyWx%2Fu74wpPZYZb8jJlrkKfFB9m%2BcQnU92cPeJ2qIkpU3g6BDoXdWSMOf567sGOp0BiVmjbs1VmnzvKN%2FiGzyqfMiWHJT1wxzMA3IOomNe5w%2FvMdWc1E68a63k11eEZf5UDvn34RNEbrd2P0LVwTF0v3bzWs6DstId7Q%2BJodvgdo12OAuKVbmVmTAoEbgYGlt35cd8aY%2F5qmC3WlVZUKfvY9FpqDGTrubfSbxLqhJmpiflEW%2FlKEydMUAu4RQBMxIYhaAKlhqPlUmRlEqCjQ%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250105T214811Z&X-Amz-SignedHeaders=host&X-Amz-Credential=ASIAW3G4ODXQQ3KCTVWN%2F20250105%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Expires=60&X-Amz-Signature=ec69f9e60acb311f919d8c05f99dcd8edc61e1f5643bef78f77f1b316df678ce"
+
+    print(is_valid_amazon_link(link))
