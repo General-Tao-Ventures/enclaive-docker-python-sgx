@@ -52,9 +52,9 @@ def is_valid_amazon_link(link):
         return False
     if not ".s3." in parsed_url.netloc:
         return False
-    if not (parsed_url.path.endswith("All%20Data%20Categories.zip")
-            or parsed_url.path.endswith("All%20Data%20Categories.7.zip")
-            or parsed_url.path.endswith("Your%20Orders.zip")
-            or parsed_url.path.endswith("Your%20Orders.7.zip")):
+    if not parsed_url.path.endswith(".zip"):
+        return False
+    if not ("All%20Data%20Categories" in parsed_url.path
+            or "Your%20Orders" in parsed_url.path):
         return False
     return True
