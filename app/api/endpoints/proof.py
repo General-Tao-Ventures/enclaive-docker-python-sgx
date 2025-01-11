@@ -40,9 +40,11 @@ async def generate_proof(
         raise HTTPException(status_code=400, detail="The proof already generated")
     
     data_hash = await download_and_hash(item.link)
+    print("Data hash:", data_hash)
     if data_hash is None:
         raise HTTPException(status_code=400, detail="Failed to download or hash data.")
 
+    print("Proof key:", proof_key)
     create_proof(db, Proof(proof_key=proof_key, data_hash=data_hash))
 
     return {"proof_key": proof_key, "link": item.link}

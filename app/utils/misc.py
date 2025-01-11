@@ -7,9 +7,19 @@ async def download_and_hash(url):
         async with aiohttp.ClientSession() as session:
             async with session.get(url, ssl=False) as resp:
                 if resp.status == 200:
-                    content = await resp.read()
-                    data_hash = hashlib.sha3_256(content).hexdigest()
-                    return data_hash
+                    # hash_obj = hashlib.sha3_256()
+                    hash_obj = hashlib.new("sha3_256")
+                    while True:
+                        chunk = await resp.content.read(4096)
+                        if not chunk:
+                            break
+                        hash_obj.update(chunk)
+                    return hash_obj.hexdigest()
+
+                    # content = await resp.read()
+                    # data_hash = hashlib.sha3_256(content).hexdigest()
+                    # return data_hash
+                
     except Exception as e:
         print(f"Error downloading or hashing data: {e}")
         return None
