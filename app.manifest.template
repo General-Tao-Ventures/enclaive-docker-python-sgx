@@ -24,7 +24,7 @@ fs.mounts = [
 ]
 sgx.rpc_thread_num = 16
 sgx.thread_num = 64
-sgx.enclave_size = "2G"
+sgx.enclave_size = "64G"
 
 sgx.debug = false
 sgx.isvprodid = 1
