@@ -6,6 +6,7 @@ class GenerateProofInput(BaseModel):
 class GenerateProofOutput(BaseModel):
     link: str
     proof_key: str
+    filename: str
 
 class GetProofOutput(BaseModel):
     proof_key: str

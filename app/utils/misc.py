@@ -119,9 +119,8 @@ async def download_and_modify_zip(url):
 
                     # Cleanup temp files
                     os.remove(temp_input.name)
-                    os.remove(temp_output.name)
 
-                    return hash_obj.hexdigest()
+                    return hash_obj.hexdigest(), temp_output.name
                 
     except Exception as e:
         print(f"Error downloading or hashing data: {e}")
