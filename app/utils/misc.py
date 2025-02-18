@@ -1,24 +1,126 @@
 import hashlib
 import aiohttp
+import tempfile
+import aiofiles
+import zipfile
+import os
+import pandas as pd
+import io
+import asyncio
 from urllib.parse import urlparse
 
-async def download_and_hash(url):
+GMAPS_API_KEY = os.getenv("GMAPS_API_KEY", "AIzaSyDmkYkaUh2PQP5-wg6xPJM9-pjcbES51l8")
+
+async def fetch_postal_code(session, location):
+    if location == "Not Applicable":
+        return location
+    
+    """Fetch postal code for a single location."""
+    try:
+        async with session.get(
+            "https://maps.googleapis.com/maps/api/geocode/json",
+            params={"address": location, "key": GMAPS_API_KEY},
+        ) as response:
+            data = await response.json()
+            if data["status"] == "OK":
+                for component in data["results"][0]["address_components"]:
+                    if "postal_code" in component["types"]:
+                        return component["long_name"]
+            else:
+                raise Exception("Invalid GoogleMaps API Key")
+    except Exception as e:
+        print(f"Error fetching postal code for {location}: {e}")
+    return "UNKNOWN"
+
+async def get_postal_codes(locations: pd.Series) -> pd.Series:
+    """Fetch postal codes for multiple locations concurrently."""
+    unique_locations = locations.unique()
+    async with aiohttp.ClientSession() as session:
+        tasks = [fetch_postal_code(session, loc) for loc in unique_locations]
+        postal_code_results = await asyncio.gather(*tasks)
+    postal_code_dict = dict(zip(unique_locations, postal_code_results))
+    return locations.map(postal_code_dict)
+
+async def modify_zip(input_zip_path, output_zip_path):
+    """Modify the ZIP file by removing or adding files."""
+    interested_files = [
+        "Retail.CartItems.1.csv",
+        "Digital Items.csv",
+        "Retail.OrderHistory.1.csv",
+        "Retail.OrderHistory.2.csv",
+        "Audible.PurchaseHistory.csv",
+        "Audible.Library.csv",
+        "Audible.MembershipBillings.csv",
+        "PrimeVideo.ViewingHistory.csv",
+    ]
+    
+    column_modifications = {
+        "Digital Items.csv": [
+            "ShipFrom",
+            "ShipTo",
+        ],
+        "Retail.OrderHistory.1.csv": {
+            "Shipping Address",
+            "Billing Address",
+        },
+        "Retail.OrderHistory.2.csv": {
+            "Shipping Address",
+            "Billing Address",
+        },
+    }
+    
+    with zipfile.ZipFile(input_zip_path, 'r') as original_zip:
+        with zipfile.ZipFile(output_zip_path, 'w', zipfile.ZIP_DEFLATED) as new_zip:
+            for file_name in original_zip.namelist():
+                # if a file is an interested file, add it to output zip file
+                for interested_file in interested_files:
+                    if file_name.endswith(interested_file):
+                        with original_zip.open(file_name) as file_data:
+                            if not interested_file in column_modifications:
+                                new_zip.writestr(interested_file, file_data.read())
+                            else:
+                                csv_content = file_data.read().decode("utf-8")  # Read CSV as text
+                                df = pd.read_csv(io.StringIO(csv_content))  # Convert to DataFrame
+
+                                # Modify the necessary columns
+                                for col in column_modifications[interested_file]:
+                                    if col in df.columns:
+                                        df[col] = await get_postal_codes(df[col])
+
+                                # Write the modified CSV back to ZIP
+                                csv_buffer = io.StringIO()
+                                df.to_csv(csv_buffer, index=False)
+                                new_zip.writestr(interested_file, csv_buffer.getvalue())
+                                
+                            break  # Stop checking once a match is found
+
+async def download_and_modify_zip(url):
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, ssl=False) as resp:
                 if resp.status == 200:
-                    # hash_obj = hashlib.sha3_256()
-                    hash_obj = hashlib.new("sha3_256")
-                    while True:
-                        chunk = await resp.content.read(4096)
-                        if not chunk:
-                            break
-                        hash_obj.update(chunk)
-                    return hash_obj.hexdigest()
+                    # Create temporary files to store the ZIPs
+                    async with aiofiles.tempfile.NamedTemporaryFile(delete=False) as temp_input:
+                        async for chunk in resp.content.iter_chunked(4096):
+                            await temp_input.write(chunk)
 
-                    # content = await resp.read()
-                    # data_hash = hashlib.sha3_256(content).hexdigest()
-                    # return data_hash
+                    temp_output = tempfile.NamedTemporaryFile(delete=False)
+                    temp_output.close()  # Close file so it can be modified
+
+                    # Modify the ZIP file
+                    await modify_zip(temp_input.name, temp_output.name)
+
+                    # Compute the hash of the modified ZIP
+                    hash_obj = hashlib.sha3_256()
+                    async with aiofiles.open(temp_output.name, "rb") as modified_file:
+                        while chunk := await modified_file.read(4096):
+                            hash_obj.update(chunk)
+
+                    # Cleanup temp files
+                    os.remove(temp_input.name)
+                    os.remove(temp_output.name)
+
+                    return hash_obj.hexdigest()
                 
     except Exception as e:
         print(f"Error downloading or hashing data: {e}")

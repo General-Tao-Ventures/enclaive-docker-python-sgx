@@ -7,7 +7,7 @@ from app.schemas.proof import GenerateProofInput, GenerateProofOutput, GetProofO
 from app.db.models.proof import Proof
 from app.services.proof import get_proof_by_proof_key, create_proof
 from app.api.deps import get_db, get_api_key
-from app.utils.misc import is_valid_amazon_link, download_and_hash
+from app.utils.misc import is_valid_amazon_link, download_and_modify_zip
 
 
 router = APIRouter()
@@ -39,7 +39,7 @@ async def generate_proof(
     if proof:
         raise HTTPException(status_code=400, detail="The proof already generated")
     
-    data_hash = await download_and_hash(item.link)
+    data_hash = await download_and_modify_zip(item.link)
     print("Data hash:", data_hash)
     if data_hash is None:
         raise HTTPException(status_code=400, detail="Failed to download or hash data.")
