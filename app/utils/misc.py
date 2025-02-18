@@ -7,9 +7,10 @@ import os
 import pandas as pd
 import io
 import asyncio
+from app.core.config import settings
 from urllib.parse import urlparse
 
-GMAPS_API_KEY = os.getenv("GMAPS_API_KEY", "AIzaSyDmkYkaUh2PQP5-wg6xPJM9-pjcbES51l8")
+GMAPS_API_KEY = settings.GMAPS_API_KEY
 
 async def fetch_postal_code(session, location):
     if location == "Not Applicable":
