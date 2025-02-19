@@ -27,6 +27,6 @@ if __name__ == "__main__":
         app, 
         host="0.0.0.0",
         port=8888,
-        ssl_keyfile="/app/certs/pi.key",
-        ssl_certfile="/app/certs/pi.pem",
+        forwarded_allow_ips="*",
+        proxy_headers=True
     )

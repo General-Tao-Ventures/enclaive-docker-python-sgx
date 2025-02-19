@@ -9,7 +9,6 @@ services:
     devices:
       - "/dev/sgx_enclave:/dev/sgx_enclave"
     volumes:
-      - ./certs:/app/certs
       - ./.env:/app/config/.env
       - ./db:/app/db
   postres:

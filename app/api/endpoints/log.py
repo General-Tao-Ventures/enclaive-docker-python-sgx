@@ -7,7 +7,6 @@ from app.schemas.log import LogInput
 from app.db.models.proof import Proof
 from app.services.proof import get_proof_by_proof_key, create_proof
 from app.api.deps import get_db, get_api_key
-from app.utils.misc import is_valid_amazon_link, download_and_hash
 
 
 router = APIRouter()
