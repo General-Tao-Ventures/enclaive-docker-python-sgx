@@ -5,3 +5,6 @@ __pycache__/
 *.pyc 
 venv/
 certs/
+demo/
+.pytest_cache/
+.DS_Store
