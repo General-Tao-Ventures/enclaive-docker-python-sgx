@@ -1,5 +1,6 @@
 import hashlib
 import aiohttp
+import time
 import tempfile
 import aiofiles
 import zipfile
@@ -100,6 +101,8 @@ async def download_and_modify_zip(url):
         async with aiohttp.ClientSession() as session:
             async with session.get(url, ssl=False) as resp:
                 if resp.status == 200:
+                    # measure download time
+                    start_time = time.time()
                     # Create temporary files to store the ZIPs
                     async with aiofiles.tempfile.NamedTemporaryFile(delete=False) as temp_input:
                         async for chunk in resp.content.iter_chunked(4096):
@@ -108,14 +111,24 @@ async def download_and_modify_zip(url):
                     temp_output = tempfile.NamedTemporaryFile(delete=False)
                     temp_output.close()  # Close file so it can be modified
 
-                    # Modify the ZIP file
-                    await modify_zip(temp_input.name, temp_output.name)
+                    end_time = time.time()
+                    print(f"Download time: {end_time - start_time} seconds")
 
+                    # Modify the ZIP file
+                    start_time = time.time()
+                    await modify_zip(temp_input.name, temp_output.name)
+                    end_time = time.time()
+                    print(f"Modify zip time: {end_time - start_time} seconds")
+
+                    # measure hash time
+                    start_time = time.time()
                     # Compute the hash of the modified ZIP
                     hash_obj = hashlib.sha3_256()
                     async with aiofiles.open(temp_output.name, "rb") as modified_file:
                         while chunk := await modified_file.read(4096):
                             hash_obj.update(chunk)
+                    end_time = time.time()
+                    print(f"Hash time: {end_time - start_time} seconds")
 
                     # Cleanup temp files
                     os.remove(temp_input.name)
