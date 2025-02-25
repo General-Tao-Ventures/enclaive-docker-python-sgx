@@ -112,6 +112,7 @@ async def download_and_modify_zip(url):
                     temp_output.close()  # Close file so it can be modified
 
                     end_time = time.time()
+                    print(f"File size: {os.path.getsize(temp_input.name) / 1024 / 1024} MB")
                     print(f"Download time: {end_time - start_time} seconds")
 
                     # Modify the ZIP file
