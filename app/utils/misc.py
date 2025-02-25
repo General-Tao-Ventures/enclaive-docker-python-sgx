@@ -14,7 +14,7 @@ from urllib.parse import urlparse
 GMAPS_API_KEY = settings.GMAPS_API_KEY
 
 async def fetch_postal_code(session, location):
-    if location == "Not Applicable":
+    if location in ["Not Applicable", "Not Available"]:
         return location
     
     """Fetch postal code for a single location."""
