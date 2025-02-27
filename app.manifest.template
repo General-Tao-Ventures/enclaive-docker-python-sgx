@@ -24,7 +24,7 @@ fs.mounts = [
     { path = "/etc/ssl/certs",    uri = "file:/etc/ssl/certs" }
 ]
 
-sgx.rpc_thread_num = 16
+sgx.rpc_thread_num = 64
 sgx.thread_num = 64
 sgx.enclave_size = "64G"
 

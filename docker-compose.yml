@@ -1,17 +1,16 @@
 version: '2'
 
 services:
-  python-sgx:
+  python-app:
     build:
       context: .
     ports:
       - "8888:8888"
-    devices:
-      - "/dev/sgx_enclave:/dev/sgx_enclave"
     volumes:
       - ./.env:/app/config/.env
       - ./db:/app/db
-  postres:
+
+  postgres:
     image: postgres:latest
     container_name: postgres
     environment:
